@@ -1,0 +1,99 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.neenbedankt.android-apt'
+
+
+Properties properties = new Properties()
+try {
+    properties.load(file('petproject.properties').newDataInputStream())
+} catch (Exception ignored) {
+    throw new GradleException("Missing petproject.properties file.")
+}
+
+def keystoreAlias = properties.get("keystore.alias")
+def keystorePass = properties.get("keystore.pass")
+def storePass = properties.get("store.pass")
+
+android {
+    signingConfigs {
+        release {
+            keyAlias keystoreAlias
+            keyPassword keystorePass
+            storeFile file('/Users/AlexBlokh/Documents/main/PetProject/keystore.jks')
+            storePassword storePass
+        }
+    }
+    compileSdkVersion 23
+    buildToolsVersion "23.0.3"
+    defaultConfig {
+        applicationId "io.petprojct"
+        minSdkVersion 16
+        targetSdkVersion 23
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            minifyEnabled false
+        }
+    }
+    productFlavors {
+        mock {
+            applicationIdSuffix ".mock"
+        }
+        production {
+
+        }
+    }
+    sourceSets {
+        debug.setRoot("src/build_types/debug")
+        release.setRoot("src/build_types/release")
+
+        mock.setRoot("src/flavors/mock")
+        production.setRoot("src/flavors/production")
+    }
+
+    lintOptions {
+        warningsAsErrors true
+        abortOnError true // Fail early.
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    testCompile 'junit:junit:4.12'
+    compile 'com.android.support:appcompat-v7:23.2.1'
+    compile 'com.android.support:design:23.2.1'
+    // <Rx>
+    // explicitly depend on RxJava's latest version for bug fixes and new features.
+    compile 'io.reactivex:rxjava:1.1.3'
+    compile 'io.reactivex:rxandroid:1.1.0'
+    // </Rx>
+    // <Dagger2>
+    apt 'com.google.dagger:dagger-compiler:2.2'
+    compile 'com.google.dagger:dagger:2.2'
+    provided 'javax.annotation:jsr250-api:1.0'
+    // </Dagger2>
+    compile 'com.jakewharton.timber:timber:4.1.2'
+    compile 'com.squareup.okhttp3:okhttp:3.2.0'
+    compile 'com.squareup.retrofit2:retrofit:2.0.2'
+    compile 'com.squareup.retrofit2:adapter-rxjava:2.0.2'
+    compile 'com.squareup.retrofit2:converter-gson:2.0.2'
+    compile 'com.google.code.gson:gson:2.6.2'
+    debugCompile 'com.facebook.stetho:stetho:1.3.1'
+    // <DebugDrawer>
+    debugCompile 'io.palaima.debugdrawer:debugdrawer:0.7.0'
+    debugCompile 'io.palaima.debugdrawer:debugdrawer-view:0.7.0'
+    debugCompile 'io.palaima.debugdrawer:debugdrawer-actions:0.7.0'
+    debugCompile 'io.palaima.debugdrawer:debugdrawer-commons:0.7.0'
+    debugCompile 'io.palaima.debugdrawer:debugdrawer-okhttp3:0.7.0'
+    debugCompile 'io.palaima.debugdrawer:debugdrawer-glide:0.7.0'
+    debugCompile 'io.palaima.debugdrawer:debugdrawer-scalpel:0.7.0'
+    debugCompile 'io.palaima.debugdrawer:debugdrawer-timber:0.7.0'
+    debugCompile 'io.palaima.debugdrawer:debugdrawer-fps:0.7.0'
+    // </DebugDrawer>
+}
